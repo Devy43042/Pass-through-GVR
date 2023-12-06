@@ -9,41 +9,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dual Camera App for VR</title>
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: black;
-    }
-
-    .camera-container {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 800px;
-    }
-
-    video {
-      width: 48%; /* Adjust as needed */
-      height: auto;
-      cursor: pointer;
-    }
-  </style>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <title>Stereoscopic VR App</title>
 </head>
 <body>
-  <div class="camera-container">
-    <video id="leftEye" onclick="switchCamera('leftEye')" playsinline autoplay></video>
-    <video id="rightEye" onclick="switchCamera('rightEye')" playsinline autoplay></video>
-  </div>
+  <a-scene>
+    <a-camera position="0 1.6 0" look-controls wasd-controls></a-camera>
+
+    <!-- Left eye -->
+    <a-video src="#leftFeed" position="-0.03 0 0" scale="1.8 1 1"></a-video>
+
+    <!-- Right eye -->
+    <a-video src="#rightFeed" position="0.03 0 0" scale="1.8 1 1"></a-video>
+
+    <a-assets>
+      <video id="leftFeed" autoplay crossorigin="anonymous"></video>
+      <video id="rightFeed" autoplay crossorigin="anonymous"></video>
+    </a-assets>
+  </a-scene>
 
   <script>
-    const leftEye = document.getElementById('leftEye');
-    const rightEye = document.getElementById('rightEye');
-    let activeCameraId = 'leftEye'; // Initial active camera
+    const leftFeed = document.getElementById('leftFeed');
+    const rightFeed = document.getElementById('rightFeed');
 
     async function startCamera(deviceId, element) {
       try {
@@ -54,22 +41,9 @@
       }
     }
 
-    function switchCamera(eye) {
-      const activeEye = document.getElementById(activeCameraId);
-      const targetEye = document.getElementById(eye);
-
-      if (activeEye) {
-        activeEye.classList.remove('active');
-        activeEye.srcObject.getTracks().forEach(track => track.stop()); // Stop the active camera stream
-      }
-
-      targetEye.classList.add('active');
-      activeCameraId = eye;
-    }
-
     // Initialize the cameras
-    startCamera({ facingMode: 'environment' }, leftEye); // Start with the rear camera for the left eye
-    startCamera({ facingMode: 'environment' }, rightEye); // Start with the rear camera for the right eye
+    startCamera({ facingMode: 'environment' }, leftFeed); // Start with the rear camera for the left eye
+    startCamera({ facingMode: 'environment' }, rightFeed); // Start with the rear camera for the right eye
   </script>
 </body>
 </html>
