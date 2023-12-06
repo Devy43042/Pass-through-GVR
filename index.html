@@ -10,7 +10,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Camera App</title>
+  <title>Dual Camera App</title>
   <style>
     body {
       display: flex;
@@ -21,29 +21,54 @@
       background-color: black;
     }
 
-    video {
+    .camera-container {
+      display: flex;
+      justify-content: space-between;
       width: 100%;
-      max-width: 600px;
-      transform: scaleX(-1); /* Flip the video horizontally to mirror the rear camera */
+      max-width: 800px;
+    }
+
+    video {
+      width: 48%; /* Adjust as needed */
+      height: auto;
+      cursor: pointer;
+      border: 2px solid white;
     }
   </style>
 </head>
 <body>
-  <video id="camera" playsinline autoplay></video>
+  <div class="camera-container">
+    <video id="camera1" onclick="switchCamera('camera1')" playsinline autoplay></video>
+    <video id="camera2" onclick="switchCamera('camera2')" playsinline autoplay></video>
+  </div>
 
   <script>
-    const video = document.getElementById('camera');
+    const camera1 = document.getElementById('camera1');
+    const camera2 = document.getElementById('camera2');
 
-    async function startCamera() {
+    async function startCamera(deviceId, element) {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        video.srcObject = stream;
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId } });
+        element.srcObject = stream;
       } catch (error) {
-        console.error('Error accessing the camera:', error);
+        console.error(`Error accessing ${deviceId} camera:`, error);
       }
     }
 
-    startCamera();
+    function switchCamera(cameraId) {
+      const activeCamera = document.querySelector('video.active');
+      const targetCamera = document.getElementById(cameraId);
+
+      if (activeCamera) {
+        activeCamera.classList.remove('active');
+      }
+
+      targetCamera.classList.add('active');
+    }
+
+    // Initialize the cameras
+    startCamera('user', camera1); // Start with the default/front camera
+    startCamera({ facingMode: { exact: 'environment' } }, camera2); // Start with the rear camera
   </script>
 </body>
 </html>
