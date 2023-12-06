@@ -11,12 +11,13 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      background-color: black; /* Set the background color to black */
+      background-color: black;
     }
 
     video {
       width: 100%;
       max-width: 600px;
+      transform: scaleX(-1); /* Flip the video horizontally to mirror the rear camera */
     }
   </style>
 </head>
@@ -28,8 +29,15 @@
 
     async function startCamera() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const rearCamera = devices.find(device => device.kind === 'videoinput' && device.label.includes('back'));
+
+        if (rearCamera) {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: rearCamera.deviceId } });
+          video.srcObject = stream;
+        } else {
+          console.error('Rear camera not found.');
+        }
       } catch (error) {
         console.error('Error accessing the camera:', error);
       }
