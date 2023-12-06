@@ -32,7 +32,6 @@
       width: 48%; /* Adjust as needed */
       height: auto;
       cursor: pointer;
-      border: 2px solid white;
     }
   </style>
 </head>
@@ -70,8 +69,8 @@
     }
 
     // Initialize the cameras
-    startCamera('user', camera1); // Start with the default/front camera
-    startCamera({ facingMode: { exact: 'environment' } }, camera2); // Start with the rear camera
+    startCamera({ facingMode: 'environment' }, camera1); // Start with the rear camera
+    startCamera({ facingMode: 'environment' }, camera2); // Start with the rear camera
   </script>
 </body>
 </html>
