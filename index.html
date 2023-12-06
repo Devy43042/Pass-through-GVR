@@ -9,7 +9,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cardboard Passthrough</title>
+  <title>Camera App</title>
   <style>
     body {
       display: flex;
@@ -36,7 +36,12 @@
 
     async function startCamera(deviceId, element) {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId } });
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            deviceId: deviceId,
+            facingMode: 'environment', // Use the rear camera
+          },
+        });
         element.srcObject = stream;
       } catch (error) {
         console.error(`Error accessing ${deviceId} camera:`, error);
@@ -44,8 +49,8 @@
     }
 
     // Initialize the cameras
-    startCamera({ facingMode: { exact: 'environment' } }, leftEye); // Start with the rear camera for the left eye
-    startCamera({ facingMode: { exact: 'environment' } }, rightEye); // Start with the rear camera for the right eye
+    startCamera(null, leftEye); // Start with the rear camera for the left eye
+    startCamera(null, rightEye); // Start with the rear camera for the right eye
   </script>
 </body>
 </html>
