@@ -9,13 +9,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Camera App</title>
+  <title>Cardboard Passthrough</title>
   <style>
     body {
       display: flex;
       justify-content: space-between;
       height: 100vh;
       margin: 0;
+      background-color: black;
       overflow: hidden;
     }
 
@@ -43,8 +44,8 @@
     }
 
     // Initialize the cameras
-    startCamera({ facingMode: 'environment' }, leftEye); // Start with the rear camera for the left eye
-    startCamera({ facingMode: 'environment' }, rightEye); // Start with the rear camera for the right eye
+    startCamera({ facingMode: { exact: 'environment' } }, leftEye); // Start with the rear camera for the left eye
+    startCamera({ facingMode: { exact: 'environment' } }, rightEye); // Start with the rear camera for the right eye
   </script>
 </body>
 </html>
