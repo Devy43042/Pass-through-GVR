@@ -9,41 +9,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <title>Stereoscopic VR App</title>
-</head>
-<body>
-  <a-scene>
-    <a-camera position="0 1.6 0" look-controls wasd-controls></a-camera>
+  <script type="module">
+    import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r115/build/three.module.js';
 
-    <!-- Left eye -->
-    <a-video src="#leftFeed" position="-0.03 0 0" scale="1.8 1 1"></a-video>
+    let camera, scene, renderer;
 
-    <!-- Right eye -->
-    <a-video src="#rightFeed" position="0.03 0 0" scale="1.8 1 1"></a-video>
+    async function init() {
+      // Set up camera
+      camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+      camera.position.z = 0.01;
 
-    <a-assets>
-      <video id="leftFeed" autoplay crossorigin="anonymous"></video>
-      <video id="rightFeed" autoplay crossorigin="anonymous"></video>
-    </a-assets>
-  </a-scene>
+      // Set up scene
+      scene = new THREE.Scene();
 
-  <script>
-    const leftFeed = document.getElementById('leftFeed');
-    const rightFeed = document.getElementById('rightFeed');
+      // Set up video textures
+      const leftTexture = await createVideoTexture({ facingMode: 'environment' });
+      const rightTexture = await createVideoTexture({ facingMode: 'environment' });
 
-    async function startCamera(deviceId, element) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { deviceId } });
-        element.srcObject = stream;
-      } catch (error) {
-        console.error(`Error accessing ${deviceId} camera:`, error);
-      }
+      // Create left eye mesh
+      const leftGeometry = new THREE.PlaneBufferGeometry(1, 1);
+      const leftMaterial = new THREE.MeshBasicMaterial({ map: leftTexture });
+      const leftMesh = new THREE.Mesh(leftGeometry, leftMaterial);
+      leftMesh.position.set(-0.5, 0, 0);
+      scene.add(leftMesh);
+
+      // Create right eye mesh
+      const rightGeometry = new THREE.PlaneBufferGeometry(1, 1);
+      const rightMaterial = new THREE.MeshBasicMaterial({ map: rightTexture });
+      const rightMesh = new THREE.Mesh(rightGeometry, rightMaterial);
+      rightMesh.position.set(0.5, 0, 0);
+      scene.add(rightMesh);
+
+      // Set up renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      // Handle window resize
+      window.addEventListener('resize', onWindowResize);
+
+      // Start rendering
+      animate();
     }
 
-    // Initialize the cameras
-    startCamera({ facingMode: 'environment' }, leftFeed); // Start with the rear camera for the left eye
-    startCamera({ facingMode: 'environment' }, rightFeed); // Start with the rear camera for the right eye
+    function createVideoTexture(constraints) {
+      return new Promise(async (resolve) => {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: constraints });
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.playsInline = true;
+        video.play();
+
+        const texture = new THREE.VideoTexture(video);
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.format = THREE.RGBFormat;
+
+        resolve(texture);
+      });
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+      renderer.setAnimationLoop(() => {
+        renderer.render(scene, camera);
+      });
+    }
+
+    init();
   </script>
+</head>
+<body style="margin: 0;">
 </body>
 </html>
+
