@@ -3,23 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="application-name" content="Passthrough GCV" />
-  <meta name="apple-mobile-web-app-title" content="Passthrough GCV" />
+  <meta name="application-name" content="Passthrough GVR" />
+  <meta name="apple-mobile-web-app-title" content="Passthrough GVR" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <link rel="apple-touch-icon" sizes="300x300" href="icon.png">
-  <title>Camera App</title>
+  <title>Passthrough GVR</title>
   <style>
     body {
       display: flex;
-      justify-content: center;
-      align-items: center;
+      justify-content: space-around;
       height: 100vh;
       margin: 0;
       background-color: black;
       overflow: hidden;
-      position: relative;
     }
 
     video {
@@ -48,7 +46,7 @@
 <body>
   <div class="filter-dropdown">
     <label for="filterSelect">Select Filter:</label>
-    <select id="filterSelect" onchange="applyFilter()">
+    <select id="filterSelect">
       <option value="none">None</option>
       <option value="grayscale">Black and White</option>
       <option value="edge-tracer">Edge Tracer</option>
