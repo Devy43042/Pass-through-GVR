@@ -52,18 +52,18 @@
     }
 
     .night-vision {
-      filter: sepia(1) hue-rotate(90deg) saturate(300%) brightness(0.8);
+      filter: sepia(1) hue-rotate(90deg) saturate(300%) brightness(0.6);
     }
 
     .slow-blink {
-      animation: blink 3s steps(1, end) infinite;
+      animation: blink 10s steps(1, end) infinite;
     }
 
     @keyframes blink {
-      0%, 50%, 100% {
+      0%, 100% {
         opacity: 1;
       }
-      25%, 75% {
+      50% {
         opacity: 0;
       }
     }
