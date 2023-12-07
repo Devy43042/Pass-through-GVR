@@ -44,11 +44,11 @@
 
     /* Define filters as CSS classes */
     .grayscale {
-      filter: grayscale(100%) contrast(100);
+      filter: grayscale(100%) contrast(100%);
     }
 
     .edge-tracer {
-      filter: brightness(0) invert(1) grayscale(1) contrast(8);
+      filter: url("#edgeDetection");
     }
 
     .night-vision {
@@ -82,6 +82,12 @@
       <option value="slow-blink">Slow Blink</option>
     </select>
   </div>
+
+  <svg height="0" xmlns="http://www.w3.org/2000/svg">
+    <filter id="edgeDetection">
+      <feColorMatrix type="matrix" values="-1 -1 -1 -1 8 -1 -1 -1 -1"/>
+    </filter>
+  </svg>
 
   <video id="leftEye" playsinline autoplay></video>
   <video id="rightEye" playsinline autoplay></video>
