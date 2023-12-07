@@ -18,6 +18,7 @@
       margin: 0;
       background-color: black;
       overflow: hidden;
+      position: relative;
     }
 
     video {
@@ -41,6 +42,17 @@
     .filter-dropdown select {
       padding: 5px;
     }
+
+    .crosshair {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 30px;
+      height: 30px;
+      transform: translate(-50%, -50%);
+      border: 2px solid white;
+      box-sizing: border-box;
+    }
   </style>
 </head>
 <body>
@@ -52,8 +64,11 @@
       <option value="url('#edge-tracer')">Edge Tracer</option>
       <option value="url('#night-vision')">Night Vision</option>
       <option value="url('#slow-blink')">Slow Blink</option>
+      <option value="url('#crosshair')">Crosshair</option>
     </select>
   </div>
+
+  <div class="crosshair"></div>
 
   <video id="leftEye" playsinline autoplay></video>
   <video id="rightEye" playsinline autoplay></video>
@@ -92,6 +107,13 @@
           <feMergeNode />
         </feMerge>
       </filter>
+
+      <!-- Crosshair Filter -->
+      <filter id="crosshair" x="0" y="0">
+        <feComponentTransfer in="SourceGraphic">
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+      </filter>
     </defs>
   </svg>
 
@@ -99,6 +121,7 @@
     const leftEye = document.getElementById('leftEye');
     const rightEye = document.getElementById('rightEye');
     const filterSelect = document.getElementById('filterSelect');
+    const crosshair = document.querySelector('.crosshair');
 
     async function startCamera(deviceId, element) {
       try {
@@ -118,6 +141,12 @@
       const selectedFilter = filterSelect.value;
       leftEye.style.filter = selectedFilter;
       rightEye.style.filter = selectedFilter;
+
+      if (selectedFilter === "url('#crosshair')") {
+        crosshair.style.display = 'block';
+      } else {
+        crosshair.style.display = 'none';
+      }
     }
 
     // Initialize the cameras
