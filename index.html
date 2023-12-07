@@ -31,14 +31,14 @@
       right: 10px; /* Adjust as needed */
       background-color: #333;
       padding: 5px;
-      border-radius: 3px;
+      border-radius: 5px;
       color: white;
-      font-size: 8px;
+      font-size: 14px;
       cursor: pointer;
     }
 
     .filter-dropdown select {
-      padding: 5px;
+      padding: 3px;
       width: 100%; /* Fix for iOS freezing issue */
     }
 
@@ -48,7 +48,7 @@
     }
 
     .edge-tracer {
-      filter: url("#edgeDetection");
+      filter: url("#edgeDetection") invert(100%);
     }
 
     .night-vision {
@@ -73,7 +73,7 @@
 </head>
 <body>
   <div class="filter-dropdown">
-    <label for="filterSelect">Select Filter:</label>
+    <label for="filterSelect">Filter:</label>
     <select id="filterSelect">
       <option value="none">None</option>
       <option value="grayscale">Black and White</option>
@@ -85,7 +85,10 @@
 
   <svg height="0" xmlns="http://www.w3.org/2000/svg">
     <filter id="edgeDetection">
-      <feColorMatrix type="matrix" values="-1 -1 -1 -1 8 -1 -1 -1 -1"/>
+      <feComponentTransfer in="SourceGraphic" result="white">
+        <feFuncA type="table" tableValues="1"/>
+      </feComponentTransfer>
+      <feConvolveMatrix in="white" order="3 3" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1"/>
     </filter>
   </svg>
 
