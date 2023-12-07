@@ -21,8 +21,14 @@
       overflow: hidden;
     }
 
+    .video-container {
+      display: flex;
+      justify-content: space-between;
+      width: 84%; /* Adjusted width */
+    }
+
     video {
-      width: 42%; /* Adjust as needed */
+      width: 48%; /* Adjusted width */
       height: auto;
     }
 
@@ -67,6 +73,11 @@
       filter: invert(100%);
     }
 
+    .bit8 {
+      image-rendering: pixelated;
+      filter: brightness(1.2) contrast(1.5) saturate(0) grayscale(0.7);
+    }
+
     @keyframes blink {
       0%, 100% {
         opacity: 1;
@@ -89,6 +100,7 @@
       <option value="night-vision">Night Vision</option>
       <option value="slow-blink">Slow Blink</option>
       <option value="invert">Invert</option>
+      <option value="bit8">8-bit</option>
     </select>
   </div>
 
@@ -101,8 +113,10 @@
     </filter>
   </svg>
 
-  <video id="leftEye" playsinline autoplay></video>
-  <video id="rightEye" playsinline autoplay></video>
+  <div class="video-container">
+    <video id="leftEye" playsinline autoplay></video>
+    <video id="rightEye" playsinline autoplay></video>
+  </div>
 
   <script>
     const leftEye = document.getElementById('leftEye');
