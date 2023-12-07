@@ -74,16 +74,8 @@
       filter: brightness(1.2) contrast(1.5) saturate(0) grayscale(0.7);
     }
 
-    .red-mono {
-      filter: grayscale(100%) contrast(100%) hue-rotate(-180deg) saturate(0) brightness(100%);
-    }
-
-    .yellow-mono {
-      filter: grayscale(100%) contrast(100%) sepia(100%) saturate(1000%) brightness(100%);
-    }
-
-    .green-mono {
-      filter: grayscale(100%) contrast(100%) hue-rotate(90deg) saturate(0) brightness(100%);
+    .edge-detection {
+      filter: url("#edgeDetection") brightness(0) invert(1);
     }
 
     @keyframes blink {
@@ -108,11 +100,18 @@
       <option value="slow-blink">Slow Blink</option>
       <option value="invert">Invert</option>
       <option value="bit8">8-bit</option>
-      <option value="red-mono">Red Mono</option>
-      <option value="yellow-mono">Yellow Mono</option>
-      <option value="green-mono">Green Mono</option>
+      <option value="edge-detection">Edge Detection</option>
     </select>
   </div>
+
+  <svg height="0" xmlns="http://www.w3.org/2000/svg">
+    <filter id="edgeDetection">
+      <feComponentTransfer in="SourceGraphic" result="white">
+        <feFuncA type="table" tableValues="1"/>
+      </feComponentTransfer>
+      <feConvolveMatrix in="white" order="3 3" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1"/>
+    </filter>
+  </svg>
 
   <div class="video-container">
     <video id="leftEye" playsinline autoplay></video>
