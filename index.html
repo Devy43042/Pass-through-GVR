@@ -21,9 +21,8 @@
     }
 
     video {
-      width: 42%; /* Adjust as needed */
+      width: 48%; /* Adjust as needed */
       height: auto;
-      filter: none; /* Initial filter */
     }
 
     .filter-dropdown {
@@ -41,6 +40,23 @@
     .filter-dropdown select {
       padding: 5px;
     }
+
+    /* Define filters as CSS classes */
+    .grayscale {
+      filter: grayscale(100%);
+    }
+
+    .edge-tracer {
+      filter: url('#edge-tracer');
+    }
+
+    .night-vision {
+      filter: url('#night-vision');
+    }
+
+    .slow-blink {
+      filter: url('#slow-blink');
+    }
   </style>
 </head>
 <body>
@@ -57,6 +73,41 @@
 
   <video id="leftEye" playsinline autoplay></video>
   <video id="rightEye" playsinline autoplay></video>
+
+  <svg height="0" width="0">
+    <defs>
+      <!-- Define filters -->
+      <filter id="edge-tracer" x="0" y="0">
+        <feComponentTransfer in="SourceGraphic">
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+        <feGaussianBlur stdDeviation="5" />
+        <feBlend mode="overlay" />
+      </filter>
+
+      <filter id="night-vision" x="0" y="0">
+        <feComponentTransfer in="SourceGraphic">
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+        <feColorMatrix type="matrix" values="0.5 0 0 0 0 0 1 0 0 0 0 0 0.2 0 0 0 0 0 1 0" />
+        <feBlend mode="overlay" />
+      </filter>
+
+      <filter id="slow-blink" x="0" y="0">
+        <feComponentTransfer in="SourceGraphic">
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComponentTransfer in="blur">
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+        <feMerge>
+          <feMergeNode in="SourceGraphic" />
+          <feMergeNode />
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
 
   <script>
     const leftEye = document.getElementById('leftEye');
@@ -80,12 +131,14 @@
     function applyFilter() {
       const selectedFilter = filterSelect.value;
 
-      if (selectedFilter === "none") {
-        leftEye.style.filter = "none";
-        rightEye.style.filter = "none";
-      } else {
-        leftEye.style.filter = `url('#${selectedFilter}')`;
-        rightEye.style.filter = `url('#${selectedFilter}')`;
+      // Remove all previous filters
+      leftEye.className = '';
+      rightEye.className = '';
+
+      // Apply new filter class if not 'none'
+      if (selectedFilter !== 'none') {
+        leftEye.classList.add(selectedFilter);
+        rightEye.classList.add(selectedFilter);
       }
     }
 
