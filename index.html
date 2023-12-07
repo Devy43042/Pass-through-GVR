@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera App</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: space-between;
+      height: 100vh;
+      margin: 0;
+      background-color: black;
+      overflow: hidden;
+    }
+
+    video {
+      width: 48%; /* Adjust as needed */
+      height: auto;
+      filter: none; /* Initial filter */
+    }
+
+    .filter-dropdown {
+      position: absolute;
+      top: -100px; /* Position off-screen */
+      left: 0;
+      margin: 10px;
+      background-color: #333;
+      padding: 10px;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .filter-dropdown select {
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="filter-dropdown">
+    <label for="filterSelect">Select Filter:</label>
+    <select id="filterSelect" onchange="applyFilter()">
+      <option value="none">None</option>
+      <option value="grayscale">Black and White</option>
+      <option value="url('#edge-tracer')">Edge Tracer</option>
+      <option value="url('#night-vision')">Night Vision</option>
+      <option value="url('#slow-blink')">Slow Blink</option>
+    </select>
+  </div>
+
+  <video id="leftEye" playsinline autoplay></video>
+  <video id="rightEye" playsinline autoplay></video>
+
+  <svg height="0" width="0">
+    <defs>
+      <!-- Edge Tracer Filter -->
+      <filter id="edge-tracer" x="0" y="0">
+        <feComponentTransfer in="SourceGraphic">
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+        <feGaussianBlur stdDeviation="5" />
+        <feBlend mode="overlay" />
+      </filter>
+
+      <!-- Night Vision Filter -->
+      <filter id="night-vision" x="0" y="0">
+        <feComponentTransfer in="SourceGraphic">
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+        <feColorMatrix type="matrix" values="0.5 0 0 0 0 0 1 0 0 0 0 0 0.2 0 0 0 0 0 1 0" />
+        <feBlend mode="overlay" />
+      </filter>
+
+      <!-- Slow Blink Filter -->
+      <filter id="slow-blink" x="0" y="0">
+        <feComponentTransfer in="SourceGraphic">
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+        <feGaussianBlur stdDeviation="5" result="blur" />
+        <feComponentTransfer in="blur">
+          <feFuncA type="table" tableValues="1 0" />
+        </feComponentTransfer>
+        <feMerge>
+          <feMergeNode in="SourceGraphic" />
+          <feMergeNode />
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
+
+  <script>
+    const leftEye = document.getElementById('leftEye');
+    const rightEye = document.getElementById('rightEye');
+    const filterSelect = document.getElementById('filterSelect');
+
+    async function startCamera(deviceId, element) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            deviceId: deviceId,
+            facingMode: 'environment', // Use the rear camera
+          },
+        });
+        element.srcObject = stream;
+      } catch (error) {
+        console.error(`Error accessing ${deviceId} camera:`, error);
+      }
+    }
+
+    function applyFilter() {
+      const selectedFilter = filterSelect.value;
+      leftEye.style.filter = selectedFilter;
+      rightEye.style.filter = selectedFilter;
+    }
+
+    // Initialize the cameras
+    startCamera(null, leftEye); // Start with the rear camera for the left eye
+    startCamera(null, rightEye); // Start with the rear camera for the right eye
+  </script>
+</body>
+</html>
