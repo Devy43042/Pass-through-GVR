@@ -26,6 +26,7 @@
     }
 
     .filter-dropdown {
+      display: none;
       position: absolute;
       top: 10px; /* Adjust as needed */
       right: 10px; /* Adjust as needed */
@@ -105,20 +106,23 @@
   <script>
     const leftEye = document.getElementById('leftEye');
     const rightEye = document.getElementById('rightEye');
+    const filterDropdown = document.querySelector('.filter-dropdown');
     const filterSelect = document.getElementById('filterSelect');
+    let timeoutId;
 
-    async function startCamera(deviceId, element) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            deviceId: deviceId,
-            facingMode: 'environment', // Use the rear camera
-          },
-        });
+    function startCamera(deviceId, element) {
+      navigator.mediaDevices.getUserMedia({
+        video: {
+          deviceId: deviceId,
+          facingMode: 'environment', // Use the rear camera
+        },
+      })
+      .then(stream => {
         element.srcObject = stream;
-      } catch (error) {
+      })
+      .catch(error => {
         console.error(`Error accessing ${deviceId} camera:`, error);
-      }
+      });
     }
 
     function applyFilter() {
@@ -135,12 +139,28 @@
       }
     }
 
+    function showDropdown() {
+      filterDropdown.style.display = 'block';
+
+      // Clear any existing timeout
+      clearTimeout(timeoutId);
+
+      // Set a timeout to hide the dropdown after 3 seconds of inactivity
+      timeoutId = setTimeout(() => {
+        filterDropdown.style.display = 'none';
+      }, 3000);
+    }
+
     // Initialize the cameras
     startCamera(null, leftEye); // Start with the rear camera for the left eye
     startCamera(null, rightEye); // Start with the rear camera for the right eye
 
     // Trigger applyFilter when the selection changes
     filterSelect.addEventListener('change', applyFilter);
+
+    // Show the dropdown on user interaction
+    document.addEventListener('click', showDropdown);
+    document.addEventListener('mousemove', showDropdown);
   </script>
 </body>
 </html>
