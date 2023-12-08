@@ -13,15 +13,22 @@
   <style>
     body {
       display: flex;
-      justify-content: space-around;
+      justify-content: center;
+      align-items: center;
       height: 100vh;
       margin: 0;
       background-color: black;
       overflow: hidden;
     }
 
+    .video-container {
+      display: flex;
+      justify-content: space-between;
+      width: 81%; /* Adjusted width */
+    }
+
     video {
-      width: 42%; /* Adjusted width */
+      width: 43%; /* Adjusted width */
       height: auto;
     }
 
@@ -50,10 +57,6 @@
       filter: grayscale(100%) contrast(100%);
     }
 
-    .edge-tracer {
-      filter: url("#edgeDetection") invert(100%);
-    }
-
     .night-vision {
       filter: sepia(1) hue-rotate(90deg) saturate(300%) brightness(0.6);
     }
@@ -64,6 +67,15 @@
 
     .invert {
       filter: invert(100%);
+    }
+
+    .bit8 {
+      image-rendering: pixelated;
+      filter: brightness(1.2) contrast(1.5) saturate(0) grayscale(0.7);
+    }
+
+    .edge-detection {
+      filter: url("#edgeDetection") brightness(0) invert(1);
     }
 
     @keyframes blink {
@@ -84,10 +96,11 @@
     <select id="filterSelect">
       <option value="none">None</option>
       <option value="grayscale">Black and White</option>
-      <option value="edge-tracer">Edge Tracer</option>
       <option value="night-vision">Night Vision</option>
       <option value="slow-blink">Slow Blink</option>
       <option value="invert">Invert</option>
+      <option value="bit8">8-bit</option>
+      <option value="edge-detection">Edge Detection</option>
     </select>
   </div>
 
@@ -100,8 +113,10 @@
     </filter>
   </svg>
 
-  <video id="leftEye" playsinline autoplay></video>
-  <video id="rightEye" playsinline autoplay></video>
+  <div class="video-container">
+    <video id="leftEye" playsinline autoplay></video>
+    <video id="rightEye" playsinline autoplay></video>
+  </div>
 
   <script>
     const leftEye = document.getElementById('leftEye');
