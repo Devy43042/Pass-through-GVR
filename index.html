@@ -71,11 +71,7 @@
 
     .bit8 {
       image-rendering: pixelated;
-      filter: brightness(1.2) contrast(1.5) saturate(0) grayscale(0.7);
-    }
-
-    .edge-detection {
-      filter: url("#edgeDetection") brightness(0) invert(1);
+      filter: brightness(1.2) contrast(70) saturate(20) grayscale(0);
     }
 
     @keyframes blink {
@@ -100,18 +96,8 @@
       <option value="slow-blink">Slow Blink</option>
       <option value="invert">Invert</option>
       <option value="bit8">8-bit</option>
-      <option value="edge-detection">Edge Detection</option>
     </select>
   </div>
-
-  <svg height="0" xmlns="http://www.w3.org/2000/svg">
-    <filter id="edgeDetection">
-      <feComponentTransfer in="SourceGraphic" result="white">
-        <feFuncA type="table" tableValues="1"/>
-      </feComponentTransfer>
-      <feConvolveMatrix in="white" order="3 3" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1"/>
-    </filter>
-  </svg>
 
   <div class="video-container">
     <video id="leftEye" playsinline autoplay></video>
