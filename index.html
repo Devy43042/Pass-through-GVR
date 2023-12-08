@@ -10,7 +10,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black" />
   <link rel="apple-touch-icon" sizes="300x300" href="icon.png">
   <title>Passthrough GVR</title>
-  <script async src="https://docs.opencv.org/master/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
   <style>
     body {
       display: flex;
@@ -25,11 +24,11 @@
     .video-container {
       display: flex;
       justify-content: space-between;
-      width: 80%; /* Adjusted width */
+      width: 81%; /* Adjusted width */
     }
 
     video {
-      width: 48%; /* Adjusted width */
+      width: 43%; /* Adjusted width */
       height: auto;
     }
 
@@ -53,8 +52,41 @@
       filter: invert(100%);
     }
 
-    canvas {
-      display: none; /* Hide the canvas used for edge detection */
+    /* Define filters as CSS classes */
+    .grayscale {
+      filter: grayscale(100%) contrast(100%);
+    }
+
+    .night-vision {
+      filter: sepia(1) hue-rotate(90deg) saturate(300%) brightness(0.6);
+    }
+
+    .slow-blink {
+      animation: blink 10s steps(1, end) infinite;
+    }
+
+    .invert {
+      filter: invert(100%);
+    }
+
+    .bit8 {
+      image-rendering: pixelated;
+      filter: brightness(1.2) contrast(1.5) saturate(0) grayscale(0.7);
+    }
+
+    .edge-detection {
+      filter: url("#edgeDetection") brightness(0) invert(1);
+    }
+
+    @keyframes blink {
+      0%, 100% {
+        opacity: 1;
+        filter: blur(0);
+      }
+      45%, 55% {
+        opacity: 0;
+        filter: blur(10px) brightness(0.3);
+      }
     }
   </style>
 </head>
@@ -63,11 +95,23 @@
     <label for="filterSelect">Filter:</label>
     <select id="filterSelect">
       <option value="none">None</option>
+      <option value="grayscale">Black and White</option>
+      <option value="night-vision">Night Vision</option>
+      <option value="slow-blink">Slow Blink</option>
+      <option value="invert">Invert</option>
+      <option value="bit8">8-bit</option>
       <option value="edge-detection">Edge Detection</option>
     </select>
   </div>
 
-  <canvas id="canvas" width="640" height="480"></canvas>
+  <svg height="0" xmlns="http://www.w3.org/2000/svg">
+    <filter id="edgeDetection">
+      <feComponentTransfer in="SourceGraphic" result="white">
+        <feFuncA type="table" tableValues="1"/>
+      </feComponentTransfer>
+      <feConvolveMatrix in="white" order="3 3" kernelMatrix="-1 -1 -1 -1 8 -1 -1 -1 -1"/>
+    </filter>
+  </svg>
 
   <div class="video-container">
     <video id="leftEye" playsinline autoplay></video>
@@ -75,86 +119,63 @@
   </div>
 
   <script>
-    let leftEye = document.getElementById('leftEye');
-    let rightEye = document.getElementById('rightEye');
-    let filterDropdown = document.querySelector('.filter-dropdown');
-    let filterSelect = document.getElementById('filterSelect');
-    let canvas = document.getElementById('canvas');
-    let videoStream;
-    let videoCapture;
+    const leftEye = document.getElementById('leftEye');
+    const rightEye = document.getElementById('rightEye');
+    const filterDropdown = document.querySelector('.filter-dropdown');
+    const filterSelect = document.getElementById('filterSelect');
+    let timeoutId;
 
-    function onOpenCvReady() {
-      // OpenCV is ready
-      filterSelect.addEventListener('change', applyFilter);
-      document.addEventListener('click', showDropdown);
-      document.addEventListener('mousemove', showDropdown);
-
-      startCamera();
-    }
-
-    function startCamera() {
+    function startCamera(deviceId, element) {
       navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: 'environment',
+          deviceId: deviceId,
+          facingMode: 'environment', // Use the rear camera
         },
       })
-      .then((stream) => {
-        videoStream = stream;
-        leftEye.srcObject = stream;
-        rightEye.srcObject = stream;
-
-        videoCapture = new cv.VideoCapture(leftEye);
-        requestAnimationFrame(processVideo);
+      .then(stream => {
+        element.srcObject = stream;
       })
       .catch(error => {
-        console.error('Error accessing camera:', error);
+        console.error(`Error accessing ${deviceId} camera:`, error);
       });
     }
 
     function applyFilter() {
       const selectedFilter = filterSelect.value;
 
-      if (selectedFilter === 'edge-detection') {
-        canvas.style.display = 'block';
-      } else {
-        canvas.style.display = 'none';
+      // Remove all previous filters
+      leftEye.className = '';
+      rightEye.className = '';
+
+      // Apply new filter class if not 'none'
+      if (selectedFilter !== 'none') {
+        leftEye.classList.add(selectedFilter);
+        rightEye.classList.add(selectedFilter);
       }
     }
 
     function showDropdown() {
       filterDropdown.style.display = 'block';
-      setTimeout(() => {
+
+      // Clear any existing timeout
+      clearTimeout(timeoutId);
+
+      // Set a timeout to hide the dropdown after 3 seconds of inactivity
+      timeoutId = setTimeout(() => {
         filterDropdown.style.display = 'none';
       }, 3000);
     }
 
-    function processVideo() {
-      let frame = new cv.Mat(videoCapture.height, videoCapture.width, cv.CV_8UC4);
-      videoCapture.read(frame);
+    // Initialize the cameras
+    startCamera(null, leftEye); // Start with the rear camera for the left eye
+    startCamera(null, rightEye); // Start with the rear camera for the right eye
 
-      // Apply the selected filter
-      applyFilter(frame);
+    // Trigger applyFilter when the selection changes
+    filterSelect.addEventListener('change', applyFilter);
 
-      cv.imshow(canvas, frame);
-      frame.delete();
-
-      requestAnimationFrame(processVideo);
-    }
-
-    function applyFilter(frame) {
-      const selectedFilter = filterSelect.value;
-
-      if (selectedFilter === 'edge-detection') {
-        // Convert the frame to grayscale
-        cv.cvtColor(frame, frame, cv.COLOR_RGBA2GRAY);
-
-        // Apply Canny edge detection
-        cv.Canny(frame, frame, 50, 100);
-
-        // Convert back to RGBA for display
-        cv.cvtColor(frame, frame, cv.COLOR_GRAY2RGBA);
-      }
-    }
+    // Show the dropdown on user interaction
+    document.addEventListener('click', showDropdown);
+    document.addEventListener('mousemove', showDropdown);
   </script>
 </body>
 </html>
